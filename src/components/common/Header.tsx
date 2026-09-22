@@ -8,6 +8,7 @@ import {
   ShieldCheck,
   Zap,
   Menu,
+  Search,
   MessageSquare,
 } from "lucide-react";
 import { BusinessProfile, CurrencyCode, UserSubscription } from "../../types";
@@ -23,6 +24,7 @@ interface Props {
   onViewLanding: () => void;
   onStartDemoTutorial?: () => void;
   onOpenSupportChat?: () => void;
+  onOpenOmniCommand?: () => void;
 }
 
 export const Header: React.FC<Props> = ({
@@ -35,6 +37,7 @@ export const Header: React.FC<Props> = ({
   onViewLanding,
   onStartDemoTutorial,
   onOpenSupportChat,
+  onOpenOmniCommand,
 }) => {
   const curr = CURRENCIES[activeCurrency] || CURRENCIES.NGN;
 
@@ -71,6 +74,21 @@ export const Header: React.FC<Props> = ({
       </div>
 
       <div className="flex items-center gap-2.5 md:gap-4">
+        {/* Quick Command & Omni-Search */}
+        {onOpenOmniCommand && (
+          <button
+            onClick={onOpenOmniCommand}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold border border-slate-200 dark:border-slate-700 transition-all shadow-2xs"
+            title="Search tools or execute quick action (⌘K)"
+          >
+            <Search className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+            <span className="hidden xl:inline text-slate-500 font-medium">Quick search...</span>
+            <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-slate-500">
+              ⌘K
+            </kbd>
+          </button>
+        )}
+
         {/* Currency Switcher */}
         <div className="flex items-center bg-slate-50 border border-slate-200 rounded-lg p-1">
           <Globe className="w-3.5 h-3.5 text-slate-500 ml-1.5 mr-1" />

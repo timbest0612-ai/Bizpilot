@@ -1,6 +1,6 @@
 {
-  "name": "BizPilot OS - AI Business Launch & Growth Platform",
-  "description": "Autonomous AI Business Operating System, Next-Gen Domain Registrar, and Cloud Edge Hosting platform that launches websites, provisions business emails, automates WhatsApp CRM, and grows sales with zero technical barriers.",
+  "name": "BizPilot OS - AI Business Launch, Prospect Intelligence & Growth Platform",
+  "description": "Autonomous AI Business Operating System with AI Prospect Segmentation, Campaign Intelligence, Next-Gen Domain Registrar, Cloud Edge Hosting, and Automated CRM.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

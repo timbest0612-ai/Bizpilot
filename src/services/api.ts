@@ -319,3 +319,115 @@ export async function fetchAdminMetrics(): Promise<AdminMetrics | null> {
 }
 
 export const getAdminMetrics = fetchAdminMetrics;
+
+// ==========================================
+// AI Prospect Segmentation & Intelligence Engine Client API
+// ==========================================
+
+export async function classifyProspectsAi(prospects: any[], products: any[]) {
+  try {
+    const res = await fetch("/api/intelligence/classify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prospects, products }),
+    });
+    if (!res.ok) throw new Error("Classification request failed");
+    return await res.json();
+  } catch (err) {
+    console.warn("Classification client call failed, using fallback:", err);
+    return { success: false, results: [] };
+  }
+}
+
+export async function parseNaturalSegmentQuery(query: string) {
+  try {
+    const res = await fetch("/api/intelligence/natural-segment", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+    });
+    if (!res.ok) throw new Error("Natural segment query failed");
+    return await res.json();
+  } catch (err) {
+    console.warn("Natural segment parse error:", err);
+    return { success: false, result: null };
+  }
+}
+
+export async function personalizeOutreachEmail(params: {
+  prospect: any;
+  product: any;
+  stepNumber?: number;
+  senderName?: string;
+}) {
+  try {
+    const res = await fetch("/api/intelligence/personalize-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) throw new Error("Personalize email request failed");
+    return await res.json();
+  } catch (err) {
+    console.warn("Personalize email error:", err);
+    return { success: false, result: null };
+  }
+}
+
+export async function analyzeCampaignPerformance(params: {
+  campaign: any;
+  segment?: any;
+}) {
+  try {
+    const res = await fetch("/api/intelligence/analyze-campaign", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) throw new Error("Campaign analysis request failed");
+    return await res.json();
+  } catch (err) {
+    console.warn("Campaign analysis error:", err);
+    return { success: false, analysis: null };
+  }
+}
+
+export async function discoverNichesAndPersonasAi(industryOrKeyword: string) {
+  try {
+    const res = await fetch("/api/intelligence/discover-niches", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ industryOrKeyword }),
+    });
+    if (!res.ok) throw new Error("Niche discovery request failed");
+    return await res.json();
+  } catch (err) {
+    console.warn("Niche discovery error:", err);
+    return { success: false, niches: [], painPoints: [], personas: [] };
+  }
+}
+
+export async function scoutSocialLeadsAi(params: {
+  platforms: string[];
+  countries: string[];
+  targetVolume: number;
+  industry?: string;
+  niche?: string;
+  subNiche?: string;
+  painKeywords?: string[];
+}) {
+  try {
+    const res = await fetch("/api/intelligence/scout-leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(params),
+    });
+    if (!res.ok) throw new Error("Social scout request failed");
+    return await res.json();
+  } catch (err) {
+    console.warn("Social scout API error:", err);
+    return { success: false, sampleProspects: [], metrics: null };
+  }
+}
+
+

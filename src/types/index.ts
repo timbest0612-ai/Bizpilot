@@ -1008,10 +1008,13 @@ export interface EmailCampaignBroadcast {
     | "NEWSLETTER_SUBSCRIBERS"
     | "HIGH_VALUE_LEADS"
     | "CUSTOM_LIST"
+    | "CUSTOM_COUNT"
     | "MEGA_100K_LEAD_VAULT"
     | "TIER1_50K_ECOMMERCE"
     | "TIER2_25K_SMB"
-    | "CSV_IMPORT_LIST";
+    | "CSV_IMPORT_LIST"
+    | "IMPORTED_FILE_CONTACTS"
+    | string;
   recipientCount: number;
   provider: "AMAZON_SES" | "RESEND" | "SENDGRID" | "MAILGUN" | "SMTP";
   status: "DRAFT" | "QUEUED" | "SENDING" | "SENT" | "SCHEDULED" | "PAUSED";
@@ -1051,6 +1054,7 @@ export interface BulkLeadRecord {
 
 export type ActiveTab =
   | "dashboard"
+  | "prospect-intelligence"
   | "domains"
   | "hosting"
   | "webmail"

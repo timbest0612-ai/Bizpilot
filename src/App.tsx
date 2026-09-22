@@ -54,6 +54,8 @@ import { LogisticsDispatchView } from "./components/growth/LogisticsDispatchView
 import { SmartInvoicingView } from "./components/growth/SmartInvoicingView";
 import { CompetitorSpyView } from "./components/growth/CompetitorSpyView";
 import { EmailBroadcasterView } from "./components/growth/EmailBroadcasterView";
+import { ProspectIntelligenceSuite } from "./components/intelligence/ProspectIntelligenceSuite";
+import { OmniCommandModal } from "./components/common/OmniCommandModal";
 
 export function App() {
   // Main app view mode: landing vs onboarding vs workspace
@@ -65,6 +67,41 @@ export function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeCurrency, setActiveCurrency] = useState<CurrencyCode>("NGN");
   const [isDemoTutorialOpen, setIsDemoTutorialOpen] = useState(false);
+  const [isOmniCommandOpen, setIsOmniCommandOpen] = useState(false);
+
+  // Global Keyboard Shortcuts & Event Bus
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setIsOmniCommandOpen((prev) => !prev);
+      }
+    };
+
+    const handleNavigate = (e: Event) => {
+      const customEvent = e as CustomEvent<{ tab: ActiveTab; payload?: any }>;
+      if (customEvent.detail?.tab) {
+        setActiveTab(customEvent.detail.tab);
+      }
+    };
+
+    const handleLeadsSynced = () => {
+      const updated = getStoredState<Lead[]>("bizpilot_leads");
+      if (updated) {
+        setLeads(updated);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("bizpilot:navigate-with-context", handleNavigate);
+    window.addEventListener("bizpilot:leads-synced", handleLeadsSynced);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("bizpilot:navigate-with-context", handleNavigate);
+      window.removeEventListener("bizpilot:leads-synced", handleLeadsSynced);
+    };
+  }, []);
 
   // Core Business Data
   const [profile, setProfile] = useState<BusinessProfile>(() => {
@@ -231,6 +268,7 @@ export function App() {
           onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           onViewLanding={() => setAppMode("landing")}
           onStartDemoTutorial={() => setIsDemoTutorialOpen(true)}
+          onOpenOmniCommand={() => setIsOmniCommandOpen(true)}
         />
 
         {/* Dynamic OS Module View Container */}
@@ -390,6 +428,10 @@ export function App() {
             />
           )}
 
+          {activeTab === "prospect-intelligence" && (
+            <ProspectIntelligenceSuite />
+          )}
+
           {activeTab === "email-broadcaster" && (
             <EmailBroadcasterView
               profile={profile}
@@ -468,6 +510,16 @@ export function App() {
         onClose={() => setIsDemoTutorialOpen(false)}
         activeTab={activeTab}
         onNavigate={(tab) => setActiveTab(tab)}
+      />
+
+      {/* Omni-Command Palette (Cmd+K) & Universal Data Bridge */}
+      <OmniCommandModal
+        isOpen={isOmniCommandOpen}
+        onClose={() => setIsOmniCommandOpen(false)}
+        onNavigate={(tab) => {
+          setActiveTab(tab as ActiveTab);
+          setIsOmniCommandOpen(false);
+        }}
       />
     </div>
   );

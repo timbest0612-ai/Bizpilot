@@ -89,6 +89,7 @@ export const Sidebar: React.FC<Props> = ({
     {
       group: "GROWTH & MARKETING",
       items: [
+        { id: "prospect-intelligence" as ActiveTab, label: "AI Prospect Intelligence", icon: Sparkles, badge: "Gemini AI" },
         { id: "email-broadcaster" as ActiveTab, label: "Bulk Email Broadcaster", icon: Mail, badge: "Resend/Google" },
         { id: "content-factory" as ActiveTab, label: "Content Factory", icon: FileText },
         { id: "marketing" as ActiveTab, label: "Marketing & Ads", icon: Megaphone },

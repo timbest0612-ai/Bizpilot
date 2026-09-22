@@ -309,6 +309,30 @@ export const DashboardOverview: React.FC<Props> = ({
         </div>
       </div>
 
+      {/* AI Prospect Segmentation & Campaign Intelligence Spotlight Banner */}
+      <div className="p-6 rounded-3xl bg-slate-900 text-white border border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-5">
+        <div className="space-y-1.5 max-w-2xl">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-500/20 text-cyan-300 text-[11px] font-bold">
+            <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+            NEW: AI Prospect Segmentation & Campaign Intelligence Engine
+          </div>
+          <h2 className="text-lg font-bold text-white tracking-tight">
+            Transform Raw Prospect Lists into Smart Segments & Targeted Outreach
+          </h2>
+          <p className="text-xs text-slate-400 leading-relaxed">
+            Multi-attribute classification, dynamic natural language segment builder, pain-to-product relevance scoring, and global compliance safeguards.
+          </p>
+        </div>
+
+        <button
+          onClick={() => onNavigate("prospect-intelligence")}
+          className="px-5 py-3 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-md shrink-0"
+        >
+          <span>Launch Intelligence Engine</span>
+          <ArrowRight className="w-4 h-4" />
+        </button>
+      </div>
+
       {/* Real-Time Operational Gap Engines Grid (CAC, Omni-Inventory, Logistics, Invoicing, Spy) */}
       <div className="space-y-3">
         <div className="flex items-center justify-between">

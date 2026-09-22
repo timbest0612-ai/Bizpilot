@@ -12,9 +12,13 @@ import {
   CheckCircle2,
   Clock,
   Sparkles,
+  FileText,
+  Mail,
+  Compass,
 } from "lucide-react";
 import { Lead, LeadStage, CurrencyCode, BusinessProfile } from "../../types";
 import { CURRENCIES } from "../../data/initialData";
+import { LeadSyncService } from "../../services/leadSync";
 
 interface Props {
   leads: Lead[];
@@ -45,6 +49,21 @@ export const CrmPipelineView: React.FC<Props> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const scoutedProspects = LeadSyncService.getScoutedProspects();
+
+  const handleImportScoutedLeads = () => {
+    if (scoutedProspects.length === 0) {
+      LeadSyncService.navigateToModule("prospect-intelligence");
+      return;
+    }
+    const res = LeadSyncService.syncProspectsToCrm(scoutedProspects, "NEW");
+    setToastMessage(
+      `✓ Successfully imported ${res.addedCount} scouted leads into CRM Pipeline! (${res.existingSkipped} already existed)`
+    );
+    setTimeout(() => setToastMessage(null), 5000);
+  };
 
   // New Lead Form State
   const [name, setName] = useState("");
@@ -116,6 +135,25 @@ export const CrmPipelineView: React.FC<Props> = ({
           </div>
 
           <div className="flex items-center gap-3">
+            {scoutedProspects.length > 0 ? (
+              <button
+                onClick={handleImportScoutedLeads}
+                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md shadow-blue-600/20 transition-all"
+                title={`Import all ${scoutedProspects.length} scouted prospects into CRM deals`}
+              >
+                <Sparkles className="w-4 h-4 text-cyan-300" />
+                <span>Import Scouted Leads ({scoutedProspects.length})</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => LeadSyncService.navigateToModule("prospect-intelligence")}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 border border-slate-700 transition-all"
+              >
+                <Compass className="w-4 h-4 text-cyan-400" />
+                <span>Scout 100k Leads</span>
+              </button>
+            )}
+
             <button
               onClick={() => setShowAddModal(true)}
               className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-1.5 shadow-md shadow-emerald-500/20 transition-all"
@@ -126,6 +164,22 @@ export const CrmPipelineView: React.FC<Props> = ({
           </div>
         </div>
       </div>
+
+      {/* Sync Toast Notification */}
+      {toastMessage && (
+        <div className="bg-emerald-500 text-white font-bold text-xs px-4 py-3 rounded-2xl flex items-center justify-between shadow-sm animate-in fade-in slide-in-from-top-1">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4" />
+            {toastMessage}
+          </span>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="text-white/80 hover:text-white text-xs"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       {/* Filter / Search Bar */}
       <div className="bg-white rounded-2xl border border-slate-200 p-4 flex flex-wrap items-center justify-between gap-3 shadow-xs">
@@ -195,18 +249,36 @@ export const CrmPipelineView: React.FC<Props> = ({
                     </p>
 
                     <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[10px]">
-                      <span className="text-slate-400">{lead.source}</span>
-                      <a
-                        href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=Hello%20${encodeURIComponent(
-                          lead.name
-                        )}!%20Following%20up%20from%20${encodeURIComponent(profile.name)}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center gap-1 text-emerald-700 font-bold hover:underline"
-                      >
-                        <MessageSquare className="w-3 h-3" />
-                        <span>Chat WhatsApp</span>
-                      </a>
+                      <span className="text-slate-400 truncate max-w-[80px]">{lead.source}</span>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, "")}?text=Hello%20${encodeURIComponent(
+                            lead.name
+                          )}!%20Following%20up%20from%20${encodeURIComponent(profile.name)}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-emerald-700 font-bold hover:underline"
+                          title="Chat on WhatsApp"
+                        >
+                          <MessageSquare className="w-3 h-3" />
+                          <span>WhatsApp</span>
+                        </a>
+                        <button
+                          onClick={() =>
+                            LeadSyncService.navigateToModule("smart-invoicing", {
+                              leadId: lead.id,
+                              clientName: lead.name,
+                              clientPhone: lead.phone,
+                              dealValue: lead.dealValue,
+                            })
+                          }
+                          className="inline-flex items-center gap-1 text-blue-600 font-bold hover:underline cursor-pointer"
+                          title="Generate Smart Invoice"
+                        >
+                          <FileText className="w-3 h-3" />
+                          <span>Invoice</span>
+                        </button>
+                      </div>
                     </div>
 
                     {/* Move Stage Selector */}
