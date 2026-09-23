@@ -71,9 +71,56 @@ export const CloudHostingView: React.FC<Props> = ({
   onNavigateToWebsite,
   onNavigateToDomains,
 }) => {
-  const [servers, setServers] = useState<CloudHostingServer[]>(INITIAL_HOSTING_SERVERS);
-  const [activeServer, setActiveServer] = useState<CloudHostingServer>(INITIAL_HOSTING_SERVERS[0]);
+  const defaultServer: CloudHostingServer = INITIAL_HOSTING_SERVERS[0] || {
+    id: "srv_los_01",
+    name: "Lagos Enterprise Node (MDXi Datacenter)",
+    domain: profile.domain || "naijaflavors.ng",
+    status: "ACTIVE",
+    ipAddress: "102.134.42.88",
+    ipv6Address: "2a01:4f8:c010:d::1",
+    location: "Lagos, Nigeria (Rack Centre MDXi)",
+    regionCode: "LOS-1",
+    memoryUsed: "1.42 GB",
+    memoryTotal: "8.00 GB",
+    storageUsed: "18.4 GB NVMe",
+    storageTotal: "120.0 GB NVMe",
+    bandwidthUsed: "84.2 GB",
+    bandwidthTotal: "Unlimited (10 Gbps Uplink)",
+    uptime: "99.994%",
+    sslActive: true,
+    http3Enabled: true,
+    ddosProtected: true,
+    autoBackups: true,
+    nodeVersion: "Node.js 22 LTS / Edge Workers",
+    phpVersion: "PHP 8.3 (OPcache Enabled)",
+    lastBackupTime: "Today at 03:00 AM (Automated Snapshot)",
+    specs: {
+      cpuUsage: 14,
+      ramUsage: 28,
+      diskUsage: 15,
+      bandwidthUsage: 8,
+      ipAddress: "102.134.42.88",
+      phpVersion: "PHP 8.3 (OPcache)",
+    },
+  };
+
+  const [servers, setServers] = useState<CloudHostingServer[]>(
+    INITIAL_HOSTING_SERVERS.length > 0 ? INITIAL_HOSTING_SERVERS : [defaultServer]
+  );
+  const [activeServer, setActiveServer] = useState<CloudHostingServer>(
+    INITIAL_HOSTING_SERVERS[0] || defaultServer
+  );
   const [emails, setEmails] = useState<BusinessEmailAccount[]>(INITIAL_BUSINESS_EMAILS);
+
+  const currentServer: CloudHostingServer = activeServer || servers[0] || defaultServer;
+  const currentSpecs = {
+    cpuUsage: currentServer?.specs?.cpuUsage ?? 14,
+    ramUsage: currentServer?.specs?.ramUsage ?? 28,
+    diskUsage: currentServer?.specs?.diskUsage ?? 15,
+    bandwidthUsage: currentServer?.specs?.bandwidthUsage ?? 8,
+    ipAddress: currentServer?.specs?.ipAddress || currentServer?.ipAddress || "102.134.42.88",
+    phpVersion: currentServer?.specs?.phpVersion || currentServer?.phpVersion || "PHP 8.3",
+  };
 
   // Tab State
   const [activeTab, setActiveTab] = useState<
@@ -87,13 +134,13 @@ export const CloudHostingView: React.FC<Props> = ({
   const [restoreSuccess, setRestoreSuccess] = useState(false);
 
   // File Manager State
-  const [filesList, setFilesList] = useState<HostingFileItem[]>(activeServer.files || []);
+  const [filesList, setFilesList] = useState<HostingFileItem[]>(currentServer?.files || []);
   const [currentDirectory, setCurrentDirectory] = useState("/public_html");
   const [newFileName, setNewFileName] = useState("");
   const [showNewFileModal, setShowNewFileModal] = useState(false);
 
   // Database Manager State
-  const [databasesList, setDatabasesList] = useState<DatabaseInstance[]>(activeServer.databases || []);
+  const [databasesList, setDatabasesList] = useState<DatabaseInstance[]>(currentServer?.databases || []);
   const [newDbName, setNewDbName] = useState("");
   const [newDbUser, setNewDbUser] = useState("db_admin");
   const [newDbType, setNewDbType] = useState<"PostgreSQL 16" | "MySQL 8.0">("MySQL 8.0");
@@ -101,10 +148,10 @@ export const CloudHostingView: React.FC<Props> = ({
 
   // WordPress Suite State
   const [wpInstances, setWpInstances] = useState<WordPressSiteInstance[]>(
-    activeServer.wordpressSites || [
+    currentServer?.wordpressSites || [
       {
         id: "wp_primary",
-        domain: activeServer.domain,
+        domain: currentServer?.domain || "naijaflavors.ng",
         wpVersion: "6.7.2",
         phpVersion: "8.3",
         status: "HEALTHY",
@@ -112,17 +159,17 @@ export const CloudHostingView: React.FC<Props> = ({
         pluginsCount: 8,
         speedScore: 99,
         autoUpdate: true,
-        adminUrl: `https://${activeServer.domain}/wp-admin/`,
+        adminUrl: `https://${currentServer?.domain || "naijaflavors.ng"}/wp-admin/`,
       },
     ]
   );
   const [isInstallingWp, setIsInstallingWp] = useState(false);
-  const [newWpDomain, setNewWpDomain] = useState(activeServer.domain);
+  const [newWpDomain, setNewWpDomain] = useState(currentServer?.domain || "naijaflavors.ng");
   const [newWpTitle, setNewWpTitle] = useState(profile.name || "Naija Flavors");
-  const [newWpAdminEmail, setNewWpAdminEmail] = useState(`admin@${activeServer.domain}`);
+  const [newWpAdminEmail, setNewWpAdminEmail] = useState(`admin@${currentServer?.domain || "naijaflavors.ng"}`);
 
   // Cron Manager State
-  const [cronJobs, setCronJobs] = useState<CronJobItem[]>(activeServer.cronJobs || []);
+  const [cronJobs, setCronJobs] = useState<CronJobItem[]>(currentServer?.cronJobs || []);
   const [newCronTitle, setNewCronTitle] = useState("");
   const [newCronCmd, setNewCronCmd] = useState("php /public_html/cron.php");
   const [newCronSched, setNewCronSched] = useState("0 * * * *");
@@ -240,7 +287,7 @@ export const CloudHostingView: React.FC<Props> = ({
               <span className="text-xs text-slate-400 font-medium">Server Location</span>
               <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
                 <Radio className="w-3 h-3 animate-ping text-emerald-400" />
-                {activeServer.location}
+                {currentServer.location}
               </span>
             </div>
             <div className="flex justify-between text-xs border-t border-slate-700/60 pt-2 text-slate-300">
@@ -303,14 +350,14 @@ export const CloudHostingView: React.FC<Props> = ({
               </div>
               <div>
                 <div className="text-3xl font-bold text-slate-900 font-mono">
-                  {activeServer.specs.cpuUsage}%
+                  {currentSpecs.cpuUsage}%
                 </div>
                 <div className="text-xs text-slate-500 mt-1">4 vCPU High-Frequency Cores</div>
               </div>
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-blue-600 h-2 rounded-full"
-                  style={{ width: `${activeServer.specs.cpuUsage}%` }}
+                  style={{ width: `${currentSpecs.cpuUsage}%` }}
                 />
               </div>
             </div>
@@ -325,14 +372,14 @@ export const CloudHostingView: React.FC<Props> = ({
               </div>
               <div>
                 <div className="text-3xl font-bold text-slate-900 font-mono">
-                  {activeServer.specs.ramUsage}%
+                  {currentSpecs.ramUsage}%
                 </div>
                 <div className="text-xs text-slate-500 mt-1">1.12 GB of 8.00 GB DDR5</div>
               </div>
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-purple-600 h-2 rounded-full"
-                  style={{ width: `${activeServer.specs.ramUsage}%` }}
+                  style={{ width: `${currentSpecs.ramUsage}%` }}
                 />
               </div>
             </div>
@@ -347,14 +394,14 @@ export const CloudHostingView: React.FC<Props> = ({
               </div>
               <div>
                 <div className="text-3xl font-bold text-slate-900 font-mono">
-                  {activeServer.specs.diskUsage}%
+                  {currentSpecs.diskUsage}%
                 </div>
                 <div className="text-xs text-slate-500 mt-1">3.4 GB of 50 GB NVMe Gen4</div>
               </div>
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-emerald-600 h-2 rounded-full"
-                  style={{ width: `${activeServer.specs.diskUsage}%` }}
+                  style={{ width: `${currentSpecs.diskUsage}%` }}
                 />
               </div>
             </div>
@@ -369,14 +416,14 @@ export const CloudHostingView: React.FC<Props> = ({
               </div>
               <div>
                 <div className="text-3xl font-bold text-slate-900 font-mono">
-                  {activeServer.specs.bandwidthUsage}%
+                  {currentSpecs.bandwidthUsage}%
                 </div>
                 <div className="text-xs text-slate-500 mt-1">128 GB of Unlimited CDN</div>
               </div>
               <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
                 <div
                   className="bg-amber-500 h-2 rounded-full"
-                  style={{ width: `${activeServer.specs.bandwidthUsage}%` }}
+                  style={{ width: `${currentSpecs.bandwidthUsage}%` }}
                 />
               </div>
             </div>
@@ -393,19 +440,19 @@ export const CloudHostingView: React.FC<Props> = ({
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                   <span className="text-slate-500 block">Primary Domain</span>
                   <span className="font-mono font-bold text-slate-900 mt-0.5 block truncate">
-                    {activeServer.domain}
+                    {currentServer.domain}
                   </span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                   <span className="text-slate-500 block">Dedicated IPv4</span>
                   <span className="font-mono font-bold text-slate-900 mt-0.5 block">
-                    {activeServer.specs.ipAddress}
+                    {currentSpecs.ipAddress}
                   </span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                   <span className="text-slate-500 block">PHP Engine</span>
                   <span className="font-mono font-bold text-slate-900 mt-0.5 block">
-                    {activeServer.specs.phpVersion} (LiteSpeed)
+                    {currentSpecs.phpVersion} (LiteSpeed)
                   </span>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">

@@ -54,6 +54,7 @@ import {
   initiateDomainTransfer,
   DomainSearchResultItem,
 } from "../../services/api";
+import { LeadSyncService } from "../../services/leadSync";
 
 interface Props {
   profile: BusinessProfile;
@@ -61,6 +62,7 @@ interface Props {
   subscription?: UserSubscription;
   onNavigateToHosting?: () => void;
   onNavigateToWebsite?: () => void;
+  onUpdateProfile?: (p: BusinessProfile) => void;
 }
 
 export const DomainRegistrarView: React.FC<Props> = ({
@@ -69,6 +71,7 @@ export const DomainRegistrarView: React.FC<Props> = ({
   subscription,
   onNavigateToHosting,
   onNavigateToWebsite,
+  onUpdateProfile,
 }) => {
   const isOwner = subscription?.tier === "OWNER_MASTER" || subscription?.isOwner || true;
   const [activeDomainTab, setActiveDomainTab] = useState<
@@ -277,6 +280,9 @@ export const DomainRegistrarView: React.FC<Props> = ({
         setRegistrationSuccess(res);
         setMyDomains([res.domainRecord, ...myDomains]);
         setSelectedDomainForDns(res.domainRecord);
+        const updatedProf = { ...profile, domain: res.domainRecord.domain };
+        onUpdateProfile?.(updatedProf);
+        LeadSyncService.syncDomainToEcosystem(res.domainRecord.domain, updatedProf);
       }
     } catch (e) {
       console.error(e);
@@ -1392,7 +1398,26 @@ export const DomainRegistrarView: React.FC<Props> = ({
                     <h3 className="text-2xl font-bold text-slate-900 font-mono">
                       {selectedDomainForDns.domain}
                     </h3>
-                    <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
+                    {profile.domain === selectedDomainForDns.domain ? (
+                      <span className="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        Primary OS Domain
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          const updated = { ...profile, domain: selectedDomainForDns.domain };
+                          onUpdateProfile?.(updated);
+                          LeadSyncService.syncDomainToEcosystem(selectedDomainForDns.domain, updated);
+                        }}
+                        className="px-3 py-1 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold border border-indigo-200 transition flex items-center gap-1"
+                        title="Set this domain as the primary domain across Cloud Hosting, Webmail, Website, and Email Broadcaster"
+                      >
+                        <Zap className="w-3.5 h-3.5 text-indigo-600" />
+                        Set as Primary Domain
+                      </button>
+                    )}
+                    <span className="hidden md:inline-flex px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold">
                       Anycast Edge DNS Active
                     </span>
                   </div>

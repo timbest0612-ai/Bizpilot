@@ -19,6 +19,7 @@ import {
   Zap,
   X,
   CheckCircle2,
+  RefreshCw,
 } from "lucide-react";
 import { ActiveTab, CurrencyCode } from "../../types";
 import { LeadSyncService } from "../../services/leadSync";
@@ -38,8 +39,9 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   onNavigate: (tab: ActiveTab) => void;
-  activeCurrency: CurrencyCode;
-  onCurrencyChange: (c: CurrencyCode) => void;
+  activeCurrency?: CurrencyCode;
+  onCurrencyChange?: (c: CurrencyCode) => void;
+  onOpenSyncCenter?: () => void;
 }
 
 export const OmniCommandModal: React.FC<Props> = ({
@@ -48,6 +50,7 @@ export const OmniCommandModal: React.FC<Props> = ({
   onNavigate,
   activeCurrency,
   onCurrencyChange,
+  onOpenSyncCenter,
 }) => {
   const [query, setQuery] = useState("");
   const [syncToast, setSyncToast] = useState<string | null>(null);
@@ -87,6 +90,33 @@ export const OmniCommandModal: React.FC<Props> = ({
   const commands: CommandItem[] = useMemo(
     () => [
       // Actions
+      {
+        id: "act-sync-master",
+        title: "⚡ Master Universal Sync (Cross-Sync All 8 Subsystems)",
+        category: "ACTION",
+        subtitle: "Reconcile Social Scout, CRM, Invoices, Webmail & Edge Cloud Hosting",
+        icon: RefreshCw,
+        badge: "Universal Sync",
+        action: () => {
+          const audit = LeadSyncService.runMasterUniversalSync();
+          setSyncToast(
+            `✓ All 8 Subsystems Synced! ${audit.crmTotal} CRM deals active, ₦${(audit.pipelineValueNgn / 1000000).toFixed(2)}M in pipeline value reconciled.`
+          );
+          setTimeout(() => setSyncToast(null), 3500);
+        },
+      },
+      {
+        id: "act-open-sync-center",
+        title: "Open Universal Ecosystem Sync Center",
+        category: "ACTION",
+        subtitle: "View live data bus topology, connected engines & cross-module flow",
+        icon: Zap,
+        badge: "Data Bus",
+        action: () => {
+          onClose();
+          onOpenSyncCenter?.();
+        },
+      },
       {
         id: "act-sync-leads",
         title: "Sync All Scouted Prospects to CRM Pipeline",

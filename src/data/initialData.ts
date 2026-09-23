@@ -999,6 +999,59 @@ export const INITIAL_AUTOMATIONS: AutomationWorkflow[] = [
       lastRun: "Yesterday",
     },
   },
+  {
+    id: "auto_4",
+    name: "7-Day Multi-Touch Non-Buyer Follow-Up Sequence",
+    description: "When a prospect receives an initial email/broadcast or clicks a product link but does not purchase within 24 hours, automatically trigger a personalized 7-day drip sequence addressing their profession and pain points. Halts immediately upon purchase.",
+    isActive: true,
+    trigger: {
+      type: "abandoned_non_buyer",
+      label: "Prospect Inactive / Non-Buyer for 24 Hours",
+      details: "Monitors Paystack checkout webhooks & CRM stages",
+    },
+    actions: [
+      {
+        id: "act_8",
+        type: "send_email",
+        label: "Day 1: Empathy & Pain-Point Solution Email",
+        config: { template: "day1_empathy_painpoint", delay: "24h" },
+      },
+      {
+        id: "act_9",
+        type: "send_email",
+        label: "Day 2: Case Study & Social Proof Demonstration",
+        config: { template: "day2_proof_case_study", delay: "48h" },
+      },
+      {
+        id: "act_10",
+        type: "send_whatsapp",
+        label: "Day 4: Overcoming Objections & FAQ via WhatsApp",
+        config: { template: "day4_faq_objections", delay: "96h" },
+      },
+      {
+        id: "act_11",
+        type: "send_email",
+        label: "Day 6: Urgent 24-Hour Fast-Action Bonus",
+        config: { template: "day6_fast_action_bonus", delay: "144h" },
+      },
+      {
+        id: "act_12",
+        type: "send_email",
+        label: "Day 7: Final Opportunity & Cart Expiry Notice",
+        config: { template: "day7_final_opportunity", delay: "168h" },
+      },
+      {
+        id: "act_13",
+        type: "update_crm",
+        label: "Update CRM Deal Status to 'NURTURE_COMPLETED'",
+        config: { tag: "Unconverted-RetargetNextMonth" },
+      },
+    ],
+    stats: {
+      runs: 312,
+      lastRun: "45 minutes ago",
+    },
+  },
 ];
 
 export const INITIAL_DAILY_PRIORITIES: DailyPriority[] = [
@@ -1240,6 +1293,14 @@ export const INITIAL_HOSTING_SERVERS: CloudHostingServer[] = [
     nodeVersion: "Node.js 22 LTS / Edge Workers",
     phpVersion: "PHP 8.3 (OPcache Enabled)",
     lastBackupTime: "Today at 03:00 AM (Automated Snapshot)",
+    specs: {
+      cpuUsage: 14,
+      ramUsage: 28,
+      diskUsage: 15,
+      bandwidthUsage: 8,
+      ipAddress: "102.134.42.88",
+      phpVersion: "PHP 8.3 (OPcache)",
+    },
     databases: [
       { id: "db_1", name: "naijaflavors_prod", user: "db_admin_nf", host: "localhost (127.0.0.1)", size: "48.2 MB", tableCount: 26, charset: "utf8mb4_unicode_ci", type: "PostgreSQL 16" },
       { id: "db_2", name: "naijaflavors_cache", user: "redis_user", host: "127.0.0.1:6379", size: "12.4 MB", tableCount: 1, charset: "binary", type: "Redis 7" },

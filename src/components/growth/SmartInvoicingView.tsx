@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FileText,
   ShieldCheck,
@@ -18,8 +18,11 @@ import {
   ExternalLink,
   MessageSquare,
   Lock,
+  Users,
+  Zap,
 } from "lucide-react";
-import { SmartInvoice, EscrowMilestone, CurrencyCode, BusinessProfile } from "../../types";
+import { SmartInvoice, EscrowMilestone, CurrencyCode, BusinessProfile, Lead } from "../../types";
+import { LeadSyncService } from "../../services/leadSync";
 
 interface Props {
   profile: BusinessProfile;
@@ -36,43 +39,19 @@ export const SmartInvoicingView: React.FC<Props> = ({
   onAddInvoice,
   onUpdateInvoice,
 }) => {
-  const [invoices, setInvoices] = useState<SmartInvoice[]>(
-    initialInvoices || [
-      {
-        id: "inv_4091",
-        invoiceNumber: "INV-2026-0891",
-        clientName: "Zenith Synergy Holdings Ltd",
-        clientEmail: "procurement@zenithsynergy.ng",
-        clientPhone: "+234 802 334 8899",
-        clientCompany: "Zenith Synergy Corporate Office",
-        issueDate: "2026-08-15",
-        dueDate: "2026-08-25",
-        currency: "NGN",
-        items: [
-          { description: "Executive Corporate Banquet Catering (100 Guests)", quantity: 100, unitPrice: 6500, total: 650000 },
-          { description: "Custom Branded Buffet Presentation & Logistics", quantity: 1, unitPrice: 75000, total: 75000 },
-          { description: "Uniformed Professional Service Staff (6 Stewards)", quantity: 6, unitPrice: 15000, total: 90000 },
-        ],
-        subtotal: 815000,
-        taxPercent: 7.5,
-        discountAmount: 15000,
-        totalAmount: 861125,
-        paidAmount: 500000,
-        status: "PARTIALLY_PAID",
-        isEscrowProtected: true,
-        escrowMilestones: [
-          { id: "m_1", title: "Milestone 1: Ingredient Procurement & Prep", description: "Food sourcing verification and chef staging approval.", amount: 500000, dueDate: "2026-08-16", status: "APPROVED_RELEASED" },
-          { id: "m_2", title: "Milestone 2: On-Site Setup & Live Banquet Service", description: "Successful delivery, warm meal service, and guest signoff.", amount: 361125, dueDate: "2026-08-25", status: "FUNDED_IN_ESCROW" },
-        ],
-        paymentLink: "https://pay.bizpilot.io/inv/INV-2026-0891",
-        notes: "Escrow funds held securely in CBN-regulated settlement trust until milestone signoff.",
-        qrCodeVerification: "QR_SECURE_HASH_89102491",
-        whatsappChaserHistory: [
-          { sentAt: "2026-08-15 10:00", templateUsed: "Cordial Initial Invoice with Paystack Link" },
-        ],
-      },
-    ]
-  );
+  const [invoices, setInvoices] = useState<SmartInvoice[]>(() => {
+    if (initialInvoices && initialInvoices.length > 0) return initialInvoices;
+    return LeadSyncService.getStoredInvoices();
+  });
+
+  const [availableLeads, setAvailableLeads] = useState<Lead[]>([]);
+  const [selectedLeadId, setSelectedLeadId] = useState("");
+  const [syncFeedback, setSyncFeedback] = useState<string | null>(null);
+
+  useEffect(() => {
+    const leads = LeadSyncService.getCrmLeads();
+    setAvailableLeads(leads);
+  }, []);
 
   const [activeTab, setActiveTab] = useState<"invoices-list" | "create-invoice" | "escrow-vault">("invoices-list");
   const [selectedInvoice, setSelectedInvoice] = useState<SmartInvoice | null>(invoices[0] || null);
@@ -82,7 +61,7 @@ export const SmartInvoicingView: React.FC<Props> = ({
   const [clientEmail, setClientEmail] = useState("");
   const [clientPhone, setClientPhone] = useState("");
   const [dueDate, setDueDate] = useState("2026-08-30");
-  const [invCurrency, setInvCurrency] = useState<CurrencyCode>("NGN");
+  const [invCurrency, setInvCurrency] = useState<CurrencyCode>(activeCurrency || "NGN");
   const [itemsList, setItemsList] = useState<Array<{ description: string; quantity: number; unitPrice: number }>>([
     { description: "Professional Services & Deliverables", quantity: 1, unitPrice: 150000 },
   ]);
@@ -95,6 +74,26 @@ export const SmartInvoicingView: React.FC<Props> = ({
     { title: "Deposit / Milestone 1: Kickoff & Material Acquisition", amountPercent: 50, dueDate: "2026-08-22" },
     { title: "Milestone 2: Final Delivery & Customer Signoff", amountPercent: 50, dueDate: "2026-08-30" },
   ]);
+
+  const handleSelectLeadToAutoFill = (leadId: string) => {
+    setSelectedLeadId(leadId);
+    if (!leadId) return;
+    const targetLead = availableLeads.find((l) => l.id === leadId);
+    if (targetLead) {
+      setClientName(targetLead.company ? `${targetLead.company} (${targetLead.name})` : targetLead.name);
+      setClientEmail(targetLead.email || "");
+      setClientPhone(targetLead.phone || "");
+      if (targetLead.dealValue && targetLead.dealValue > 0) {
+        setItemsList([
+          {
+            description: targetLead.notes ? `Enterprise Solution: ${targetLead.notes.slice(0, 45)}...` : "Custom Business Package",
+            quantity: 1,
+            unitPrice: targetLead.dealValue,
+          },
+        ]);
+      }
+    }
+  };
 
   const handleAddItemRow = () => {
     setItemsList([...itemsList, { description: "", quantity: 1, unitPrice: 0 }]);
@@ -150,10 +149,12 @@ export const SmartInvoicingView: React.FC<Props> = ({
       whatsappChaserHistory: [],
     };
 
-    const updated = [newInv, ...invoices];
+    const updated = LeadSyncService.saveInvoice(newInv, true);
     setInvoices(updated);
     setSelectedInvoice(newInv);
     onAddInvoice?.(newInv);
+    setSyncFeedback(`✓ Invoice #${newInv.invoiceNumber} saved & synced to CRM Pipeline as Proposal!`);
+    setTimeout(() => setSyncFeedback(null), 4000);
     setActiveTab("invoices-list");
   };
 
@@ -230,6 +231,14 @@ export const SmartInvoicingView: React.FC<Props> = ({
         })}
       </div>
 
+      {/* Cross-Module Sync Toast */}
+      {syncFeedback && (
+        <div className="p-3 bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2 animate-in fade-in">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{syncFeedback}</span>
+        </div>
+      )}
+
       {/* TAB 1: INVOICES & WHATSAPP CHASERS */}
       {activeTab === "invoices-list" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -293,6 +302,18 @@ export const SmartInvoicingView: React.FC<Props> = ({
                       className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg flex items-center gap-1.5"
                     >
                       <Printer className="w-3.5 h-3.5" /> Print / PDF
+                    </button>
+                    <button
+                      onClick={() => {
+                        LeadSyncService.saveInvoice(selectedInvoice, true);
+                        setSyncFeedback(`✓ Invoice #${selectedInvoice.invoiceNumber} successfully synced into CRM Pipeline!`);
+                        setTimeout(() => setSyncFeedback(null), 3500);
+                      }}
+                      className="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 border border-indigo-200 dark:border-indigo-800 text-indigo-700 dark:text-indigo-300 text-xs font-bold rounded-lg flex items-center gap-1.5"
+                      title="Sync client details and invoice amount directly into CRM deals"
+                    >
+                      <Zap className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
+                      Sync CRM
                     </button>
                     <button
                       onClick={() => navigator.clipboard.writeText(selectedInvoice.paymentLink)}
@@ -387,9 +408,30 @@ export const SmartInvoicingView: React.FC<Props> = ({
       {/* TAB 2: CREATE INVOICE */}
       {activeTab === "create-invoice" && (
         <form onSubmit={handleSaveInvoice} className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
-          <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
-            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Create New Smart Invoice with Escrow</h3>
-            <p className="text-xs text-slate-500">Set payment milestones, tax rates, and client contact details.</p>
+          <div className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Create New Smart Invoice with Escrow</h3>
+              <p className="text-xs text-slate-500">Set payment milestones, tax rates, and client contact details.</p>
+            </div>
+
+            {availableLeads.length > 0 && (
+              <div className="flex items-center gap-2 bg-teal-50 dark:bg-teal-950/60 border border-teal-200 dark:border-teal-800/80 px-3 py-1.5 rounded-xl">
+                <Users className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400 shrink-0" />
+                <span className="text-[11px] font-bold text-teal-900 dark:text-teal-200 shrink-0">Auto-fill Lead:</span>
+                <select
+                  value={selectedLeadId}
+                  onChange={(e) => handleSelectLeadToAutoFill(e.target.value)}
+                  className="bg-transparent text-xs font-semibold text-teal-900 dark:text-teal-100 focus:outline-none cursor-pointer max-w-[200px] truncate"
+                >
+                  <option value="">Select CRM Lead / Deal...</option>
+                  {availableLeads.map((l) => (
+                    <option key={l.id} value={l.id} className="text-slate-900 bg-white">
+                      {l.name} ({l.company || l.source}) - {l.currency} {l.dealValue.toLocaleString()}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">

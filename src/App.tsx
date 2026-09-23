@@ -56,6 +56,7 @@ import { CompetitorSpyView } from "./components/growth/CompetitorSpyView";
 import { EmailBroadcasterView } from "./components/growth/EmailBroadcasterView";
 import { ProspectIntelligenceSuite } from "./components/intelligence/ProspectIntelligenceSuite";
 import { OmniCommandModal } from "./components/common/OmniCommandModal";
+import { UniversalSyncCenterModal } from "./components/common/UniversalSyncCenterModal";
 
 export function App() {
   // Main app view mode: landing vs onboarding vs workspace
@@ -68,6 +69,7 @@ export function App() {
   const [activeCurrency, setActiveCurrency] = useState<CurrencyCode>("NGN");
   const [isDemoTutorialOpen, setIsDemoTutorialOpen] = useState(false);
   const [isOmniCommandOpen, setIsOmniCommandOpen] = useState(false);
+  const [isSyncCenterOpen, setIsSyncCenterOpen] = useState(false);
 
   // Global Keyboard Shortcuts & Event Bus
   useEffect(() => {
@@ -92,14 +94,34 @@ export function App() {
       }
     };
 
+    const handleDomainSynced = (e: Event) => {
+      const customEvent = e as CustomEvent<{ domain: string; profile?: BusinessProfile }>;
+      if (customEvent.detail?.profile) {
+        setProfile(customEvent.detail.profile);
+      } else if (customEvent.detail?.domain) {
+        setProfile((prev) => ({ ...prev, domain: customEvent.detail.domain }));
+      }
+    };
+
+    const handleSystemSynced = () => {
+      const updatedLeads = getStoredState<Lead[]>("bizpilot_leads");
+      if (updatedLeads) setLeads(updatedLeads);
+      const updatedProfile = getStoredState<BusinessProfile>("bizpilot_profile");
+      if (updatedProfile) setProfile(updatedProfile);
+    };
+
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("bizpilot:navigate-with-context", handleNavigate);
     window.addEventListener("bizpilot:leads-synced", handleLeadsSynced);
+    window.addEventListener("bizpilot:domain-synced", handleDomainSynced);
+    window.addEventListener("bizpilot:system-synced", handleSystemSynced);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("bizpilot:navigate-with-context", handleNavigate);
       window.removeEventListener("bizpilot:leads-synced", handleLeadsSynced);
+      window.removeEventListener("bizpilot:domain-synced", handleDomainSynced);
+      window.removeEventListener("bizpilot:system-synced", handleSystemSynced);
     };
   }, []);
 
@@ -269,6 +291,7 @@ export function App() {
           onViewLanding={() => setAppMode("landing")}
           onStartDemoTutorial={() => setIsDemoTutorialOpen(true)}
           onOpenOmniCommand={() => setIsOmniCommandOpen(true)}
+          onOpenSyncCenter={() => setIsSyncCenterOpen(true)}
         />
 
         {/* Dynamic OS Module View Container */}
@@ -294,6 +317,7 @@ export function App() {
               subscription={subscription}
               onNavigateToHosting={() => setActiveTab("hosting")}
               onNavigateToWebsite={() => setActiveTab("website-builder")}
+              onUpdateProfile={(p) => setProfile(p)}
             />
           )}
 
@@ -520,6 +544,22 @@ export function App() {
           setActiveTab(tab as ActiveTab);
           setIsOmniCommandOpen(false);
         }}
+        activeCurrency={activeCurrency}
+        onCurrencyChange={(c) => setActiveCurrency(c)}
+        onOpenSyncCenter={() => setIsSyncCenterOpen(true)}
+      />
+
+      {/* Universal Ecosystem Sync Center Modal */}
+      <UniversalSyncCenterModal
+        isOpen={isSyncCenterOpen}
+        onClose={() => setIsSyncCenterOpen(false)}
+        onNavigate={(tab) => {
+          setActiveTab(tab);
+          setIsSyncCenterOpen(false);
+        }}
+        profile={profile}
+        activeCurrency={activeCurrency}
+        leadsCount={leads.length}
       />
     </div>
   );

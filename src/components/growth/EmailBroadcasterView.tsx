@@ -64,6 +64,7 @@ import {
   PROVIDER_PRICING,
   SAMPLE_CSV_EXPORT,
 } from "../../data/leadVaultData";
+import { SevenDayFollowUpSequenceView } from "./SevenDayFollowUpSequenceView";
 
 export interface ImportedContact {
   id: string;
@@ -295,6 +296,7 @@ export const EmailBroadcasterView: React.FC<Props> = ({
   // Tab State
   const [activeTab, setActiveTab] = useState<
     | "broadcast-compose"
+    | "7day-followups"
     | "lead-vault-100k"
     | "live-queue-console"
     | "audience-list"
@@ -1042,6 +1044,7 @@ export const EmailBroadcasterView: React.FC<Props> = ({
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 dark:border-slate-800 scrollbar-none">
         {[
           { id: "broadcast-compose", label: "Broadcast Composer (Up to 100k)", icon: Send },
+          { id: "7day-followups", label: "7-Day Nurture & Non-Buyer Sequences", icon: Clock },
           { id: "live-queue-console", label: `Live Queue Console ${isSending ? "• SENDING" : ""}`, icon: Activity },
           { id: "lead-vault-100k", label: `100,000 Lead Vault (${totalLeadVaultCount.toLocaleString()})`, icon: Database },
           { id: "audience-list", label: `Google Sign-In Leads (${capturedUsers.length})`, icon: Users },
@@ -1877,6 +1880,17 @@ export const EmailBroadcasterView: React.FC<Props> = ({
             </div>
           </div>
         </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB: 7-DAY NURTURE & NON-BUYER FOLLOW-UP SEQUENCES */}
+      {/* ========================================================================= */}
+      {activeTab === "7day-followups" && (
+        <SevenDayFollowUpSequenceView
+          profile={profile}
+          activeCurrency={activeCurrency}
+          scoutedProspects={scoutedProspects}
+        />
       )}
 
       {/* ========================================================================= */}

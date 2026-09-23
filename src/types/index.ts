@@ -367,7 +367,7 @@ export interface AutomationWorkflow {
   description: string;
   isActive: boolean;
   trigger: {
-    type: "form_submitted" | "lead_created" | "stage_changed" | "payment_received" | "whatsapp_message";
+    type: "form_submitted" | "lead_created" | "stage_changed" | "payment_received" | "whatsapp_message" | "abandoned_non_buyer";
     label: string;
     details: string;
   };
@@ -750,6 +750,15 @@ export interface CloudHostingServer {
   ftpAccounts?: FtpSshAccount[];
   cronJobs?: CronJob[];
   wordpressSites?: WordPressInstallation[];
+  files?: any[];
+  specs?: {
+    cpuUsage: number;
+    ramUsage: number;
+    diskUsage: number;
+    bandwidthUsage: number;
+    ipAddress?: string;
+    phpVersion?: string;
+  };
 }
 
 export interface BusinessEmailAccount {

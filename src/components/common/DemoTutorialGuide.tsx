@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Sparkles,
   ArrowRight,
@@ -20,6 +20,12 @@ import {
   Coins,
   ShieldCheck,
   TrendingUp,
+  Clock,
+  RefreshCw,
+  Terminal,
+  Copy,
+  GitBranch,
+  ExternalLink,
 } from "lucide-react";
 import { ActiveTab } from "../../types";
 
@@ -35,13 +41,14 @@ export interface DemoStep {
   syncExplanation: string;
   profitStrategy: string;
   actionHint: string;
+  codeSnippet?: string;
 }
 
 export const DEMO_STEPS: DemoStep[] = [
   {
     id: 1,
     title: "AI Executive Brain & Business Intelligence",
-    subtitle: "Step 1 of 12 • Core Strategy",
+    subtitle: "Step 1 of 15 • Core Strategy",
     tab: "business-manager",
     badge: "AI Brain",
     icon: Bot,
@@ -55,13 +62,13 @@ export const DEMO_STEPS: DemoStep[] = [
     syncExplanation:
       "🔄 Synced: The business intelligence defined here auto-populates your domain suggestions, website copy, ad campaigns, and SEO keywords.",
     profitStrategy:
-      "💰 Monetization Formula: Clarify your high-margin irresistible offer. If you are selling an ebook like 'The Rest You Deserve' at ₦15,000 ($25) or consulting at ₦250,000 ($400), the AI Brain identifies exactly which audience pain points trigger immediate buying decisions.",
+      "💰 Monetization Formula: Clarify your high-margin irresistible offer. If you are selling a product or guide at ₦15,000 ($25) or consulting at ₦250,000 ($400), the AI Brain identifies exactly which audience pain points trigger immediate buying decisions.",
     actionHint: "Ask the AI Brain for a customized growth strategy or click 'Next' to view your Domain Registrar.",
   },
   {
     id: 2,
     title: "Domain Registrar & Anycast DNS",
-    subtitle: "Step 2 of 12 • Identity & Trust",
+    subtitle: "Step 2 of 15 • Identity & Trust",
     tab: "domains",
     badge: "Registrar",
     icon: Globe,
@@ -71,17 +78,18 @@ export const DEMO_STEPS: DemoStep[] = [
       "Live NiRA & ICANN availability lookup across 20+ TLDs",
       "👑 Platform Owner 1-Click Free Registration Bypass (₦0 / $0)",
       "Instant DNS management (A, CNAME, MX, TXT, SPF, DKIM)",
+      "1-Click 'Set as Primary Domain' binding across Webmail, Hosting, and Email Broadcaster",
     ],
     syncExplanation:
-      "🔄 Synced: Registered domains immediately bind to your Cloud Hosting virtual hosts, SSL certificates, and custom professional webmail.",
+      "🔄 Synced: Registered domains immediately bind to your Cloud Hosting virtual hosts, SSL certificates, custom professional webmail, and outbound email sender.",
     profitStrategy:
-      "💰 Monetization Formula: Having your own branded domain (e.g. therestyoudeserve.com) builds 10x more trust than a generic link. You can also register and flip high-value local domains or bundle custom domain setups for client retainer fees.",
+      "💰 Monetization Formula: Having your own branded domain builds 10x more trust than a generic link. You can also register and flip high-value local domains or bundle custom domain setups for client retainer fees.",
     actionHint: "Search for a domain name or test the '👑 Owner Free' button, then proceed to Cloud Hosting.",
   },
   {
     id: 3,
     title: "Edge Cloud Hosting & High-Frequency VPS",
-    subtitle: "Step 3 of 12 • Infrastructure",
+    subtitle: "Step 3 of 15 • Infrastructure",
     tab: "hosting",
     badge: "99.99% Uptime",
     icon: Server,
@@ -101,7 +109,7 @@ export const DEMO_STEPS: DemoStep[] = [
   {
     id: 4,
     title: "Multi-Page AI Website & Funnel Engine",
-    subtitle: "Step 4 of 12 • Online Storefront",
+    subtitle: "Step 4 of 15 • Online Storefront",
     tab: "website-builder",
     badge: "Multi-Page & Blog",
     icon: Layers,
@@ -121,7 +129,7 @@ export const DEMO_STEPS: DemoStep[] = [
   {
     id: 5,
     title: "SEO Studio & Google Search Dominance",
-    subtitle: "Step 5 of 12 • Organic Traffic",
+    subtitle: "Step 5 of 15 • Organic Traffic",
     tab: "seo",
     badge: "Google #1",
     icon: Search,
@@ -135,61 +143,62 @@ export const DEMO_STEPS: DemoStep[] = [
     syncExplanation:
       "🔄 Synced: SEO keywords and schema markup are embedded directly into your website's HTML headers for instant Google indexing.",
     profitStrategy:
-      "💰 Monetization Formula: Generate free recurring inbound organic buyers from Google search without spending millions on PPC ads. High-intent queries (e.g. 'how to cure burnout in executives') bring pre-qualified buyers directly to your offer.",
+      "💰 Monetization Formula: Generate free recurring inbound organic buyers from Google search without spending millions on PPC ads. High-intent queries bring pre-qualified buyers directly to your offer.",
     actionHint: "Review your Google Snippet preview and SEO score, then move to Omni-Channel Social Scout.",
   },
   {
     id: 6,
-    title: "Omni-Channel Social Scout (100k Scraping)",
-    subtitle: "Step 6 of 12 • Lead Acquisition",
+    title: "Omni-Channel Social Scout (Pain-Point Extraction)",
+    subtitle: "Step 6 of 15 • Lead Acquisition",
     tab: "prospect-intelligence",
     badge: "100k Leads",
     icon: Target,
     description:
-      "Scrape and scout up to 100,000 pre-qualified business leads, corporate decision-makers, and active buyers across TikTok, Instagram, LinkedIn, YouTube, X, Facebook, and niche forums.",
+      "Scrape and scout pre-qualified business leads, corporate decision-makers, and active buyers across LinkedIn, X (Twitter), Instagram, TikTok, YouTube, and Google Maps with automatic pain-point extraction.",
     keyFeatures: [
-      "Omni-Channel filters: Platform, Country, Job Title, Buying Power, Intent",
+      "Omni-Channel filters: Platform, Country, Profession, Buying Power, Intent",
+      "Automatic Pain-Point Extraction: Identifies burnout, high acquisition cost, pipeline inconsistency, or operational bottlenecks per lead",
       "Real-time contact extraction: Verified email addresses, phones, and social handles",
       "1-Click Vault Ingestion and instant sync to CRM and WhatsApp queues",
     ],
     syncExplanation:
-      "🔄 Synced: Every scouted batch automatically creates dynamic segments and feeds directly into your Bulk Email Broadcaster and CRM Pipeline.",
+      "🔄 Synced: Every scouted batch automatically creates dynamic segments and feeds directly into your Bulk Email Broadcaster, CRM Pipeline, and 7-Day Follow-Up Engine.",
     profitStrategy:
       "💰 Monetization Formula: Stop waiting for customers to find you. Scrape 10,000 verified leads in your target demographic (e.g. stressed executives, startup founders, or corporate HR directors) in minutes for $0 in ad spend.",
-    actionHint: "Filter by Country or Job Title, scrape a batch of leads, and click 'Bulk Email Broadcast'.",
+    actionHint: "Filter by Profession (e.g. Tech Founders, Doctors, Brokers), scrape a batch of leads, and click 'Bulk Email Broadcast'.",
   },
   {
     id: 7,
-    title: "AI Prospect Intelligence & Persona Matching",
-    subtitle: "Step 7 of 12 • Smart Targeting",
+    title: "AI Prospect Intelligence & Persona Segmentation",
+    subtitle: "Step 7 of 15 • Smart Targeting",
     tab: "prospect-intelligence",
-    badge: "AI Scoring",
+    badge: "AI Personas",
     icon: Sparkles,
     description:
-      "Autonomous AI classification engine that analyzes each prospect's primary pain points, estimated budget, urgency score, and matches them to your optimal product.",
+      "Segment audiences across both Profession (Founders, C-Suite, Healthcare, Real Estate, Importers) and Psychological Persona (Skeptical Pragmatist, Urgent Problem Solver, Analytical ROI, High Achiever).",
     keyFeatures: [
-      "Automated Persona detection (Executive Burnout, Cost Optimization, Scaling)",
+      "Psychological Persona Detection: Identifies whether buyer needs proof/escrow, rapid 72-hr relief, ROI statistics, or VIP status",
       "Purchasing power tiering (Tier-1 Enterprise, SMB, Mid-Market)",
       "Dynamic segment generator for precision targeted messaging",
     ],
     syncExplanation:
       "🔄 Synced: Matched prospect segments ensure that when you launch a campaign, the pitch addresses the exact problem that prospect is experiencing.",
     profitStrategy:
-      "💰 Monetization Formula: Cold outreach response rates jump from 1% to 15%+ when the prospect feels you read their mind. Pitching 'The Rest You Deserve' specifically to leaders classified under 'Chronic Burnout' yields maximum conversions.",
+      "💰 Monetization Formula: Cold outreach response rates jump from 1% to 15%+ when the prospect feels you read their mind. Pitching specifically to leaders classified under 'Chronic Burnout' or 'High Acquisition Costs' yields maximum conversions.",
     actionHint: "View the AI Product Matcher to see how prospects are mapped to specific offers.",
   },
   {
     id: 8,
-    title: "White-Label Bulk Email Broadcaster",
-    subtitle: "Step 8 of 12 • Scale Outreach",
+    title: "White-Label Bulk Email Broadcaster (Up to 100k)",
+    subtitle: "Step 8 of 15 • Scale Outreach",
     tab: "email-broadcaster",
     badge: "100k Inboxes",
     icon: Mail,
     description:
-      "High-throughput dispatch engine capable of sending up to 100,000 emails per campaign with 100% White-Label custom sender identity (e.g. from your own brand, not BizPilot).",
+      "High-throughput dispatch engine capable of sending up to 100,000 emails per campaign with 100% White-Label custom sender identity (e.g. from your own brand domain, zero BizPilot branding).",
     keyFeatures: [
-      "100% White-Label Custom Sender Name & Email (zero BizPilot branding)",
-      "1-Click Presets for your Ebook, Catering, Agency, or Consulting products",
+      "100% White-Label Custom Sender Name & Email (e.g., hello@yourbrand.com)",
+      "Direct integration with Amazon SES, Resend API, or your private Webmail SMTP",
       "👑 Platform Owner 100% Free Dispatch Bypass ($0 / ₦0 provider fee waived)",
       "High-concurrency parallel worker queues with RFC 8058 spam compliance",
     ],
@@ -197,19 +206,42 @@ export const DEMO_STEPS: DemoStep[] = [
       "🔄 Synced: Direct integration with your Scraped Social Leads, dynamic AI segments, and CRM lead databases.",
     profitStrategy:
       "💰 Monetization Formula: Send 10,000 customized cold emails directly promoting your ebook or services. At a modest 1.5% conversion on a ₦15,000 ($25) guide, 150 buyers generate ₦2,250,000 ($3,750) in pure, immediate profit with $0 outbound delivery costs.",
-    actionHint: "Select 'My Own Business / Product Brand', apply 'The Rest You Deserve' preset, and test an instant preview.",
+    actionHint: "Select 'My Own Business / Product Brand', apply your product preset, and test an instant preview.",
   },
   {
     id: 9,
+    title: "7-Day Autonomous Non-Buyer Follow-Up Sequence",
+    subtitle: "Step 9 of 15 • Drip Automation",
+    tab: "email-broadcaster",
+    badge: "7-Day Drip",
+    icon: Clock,
+    description:
+      "Automatically nurture prospects who receive an email or visit your page but do not buy within 24 hours. A 5-milestone drip over 168 hours tailored to their career and psychological persona.",
+    keyFeatures: [
+      "Day 1 (24h): Empathy & Deep Pain-Point Hook without hard selling",
+      "Day 2 (48h): Case Study, Social Proof, and peer transformation",
+      "Day 4 (96h): Skepticism & Objection Crusher with 1-click WhatsApp concierge chat",
+      "Day 6 (144h): Urgent 24-hour Fast-Action Bonus & Scarcity incentive",
+      "Day 7 (168h): Final Opportunity & polite closure notice",
+      "🛡️ Smart Reputational Protection: Stops automatically the second a prospect pays on Paystack or in CRM",
+    ],
+    syncExplanation:
+      "🔄 Synced: Directly monitored by Paystack checkout webhooks, CRM deal stages, and smart invoicing statuses.",
+    profitStrategy:
+      "💰 Monetization Formula: 80% of sales happen after the first email. An automated 7-day follow-up recovers 3x to 5x more abandoned carts and non-buyers on autopilot.",
+    actionHint: "Click the '7-Day Nurture & Non-Buyer Sequences' tab in Email Broadcaster and toggle 'Sequence: RUNNING'.",
+  },
+  {
+    id: 10,
     title: "WhatsApp Commerce & Outreach Queue",
-    subtitle: "Step 9 of 12 • Instant Closing",
+    subtitle: "Step 10 of 15 • Instant Closing",
     tab: "whatsapp",
     badge: "98% Open Rate",
     icon: MessageSquare,
     description:
       "Turn conversations into immediate cash with automated WhatsApp reply flows, interactive product catalog cards, and 1-click Paystack payment links inside chats.",
     keyFeatures: [
-      "Lead Outreach Queue with 1-click personalized WhatsApp opening hooks",
+      "Lead Outreach Queue with 1-click personalized WhatsApp opening hooks (wa.me/phone?text=...)",
       "Interactive chat simulator with automated keyword triggers & product cards",
       "Instant Paystack payment link generation inside WhatsApp conversations",
     ],
@@ -220,9 +252,9 @@ export const DEMO_STEPS: DemoStep[] = [
     actionHint: "Open the WhatsApp Outreach Queue and click 'Send WhatsApp' on any prospect.",
   },
   {
-    id: 10,
+    id: 11,
     title: "CRM Pipeline & Deal Flow Automation",
-    subtitle: "Step 10 of 12 • Sales Pipeline",
+    subtitle: "Step 11 of 15 • Sales Pipeline",
     tab: "crm",
     badge: "Pipeline",
     icon: Users,
@@ -236,33 +268,34 @@ export const DEMO_STEPS: DemoStep[] = [
     syncExplanation:
       "🔄 Synced: When a deal is moved to 'Customer', revenue is automatically added to your Business Analytics and Paystack sales ledger.",
     profitStrategy:
-      "💰 Monetization Formula: 80% of sales are made between the 5th and 12th contact. A systematic CRM prevents lost leads, allowing you to consistently close ₦500,000 to ₦5,000,000+ corporate retainers.",
+      "💰 Monetization Formula: A systematic CRM prevents lost leads, allowing you to consistently close ₦500,000 to ₦5,000,000+ corporate retainers and bulk orders.",
     actionHint: "Drag and drop lead cards across stages to see pipeline value update automatically.",
   },
   {
-    id: 11,
+    id: 12,
     title: "Smart Invoicing & 100% Escrow Protection",
-    subtitle: "Step 11 of 12 • Corporate Billing",
+    subtitle: "Step 12 of 15 • Corporate Billing",
     tab: "smart-invoicing",
     badge: "Escrow & VAT",
     icon: FileText,
     description:
       "Issue formal corporate PDF invoices with automated 7.5% VAT calculations, milestone billing schedules, and 100% Escrow buyer protection that builds instant trust.",
     keyFeatures: [
-      "1-Click PDF invoice generation and instant download",
-      "Escrow release controls (Funds held safely until milestones are approved)",
-      "Automatic CRM sync: Invoiced leads automatically advance to 'Proposal Sent'",
+      "1-Click CRM Lead Auto-Fill (select any lead to populate name, email, phone, and deal value)",
+      "Automatic CRM Sync: Invoicing a lead advances them to 'Proposal' in your sales pipeline",
+      "Escrow release controls (funds held safely until milestones are approved)",
+      "1-Click PDF invoice download and instant WhatsApp share link",
     ],
     syncExplanation:
       "🔄 Synced: Invoices can be dispatched directly to your scouted CRM leads, updating deal values and payment statuses in real time.",
     profitStrategy:
       "💰 Monetization Formula: Corporate B2B clients and high-net-worth customers will not pay into random personal accounts. Formal VAT invoices with escrow protection enable you to charge premium rates without hesitation.",
-    actionHint: "Generate a corporate invoice for a client or inspect the Escrow security badges.",
+    actionHint: "Click '+ New Invoice', select a CRM lead from the dropdown, and click 'Create & Sync CRM'.",
   },
   {
-    id: 12,
+    id: 13,
     title: "Paystack Payments & Business Analytics",
-    subtitle: "Step 12 of 12 • Revenue & Profit",
+    subtitle: "Step 13 of 15 • Revenue & Profit",
     tab: "sales",
     badge: "Revenue Engine",
     icon: ShoppingBag,
@@ -276,8 +309,81 @@ export const DEMO_STEPS: DemoStep[] = [
     syncExplanation:
       "🔄 Synced: Completed payments update customer records, refresh revenue charts, and trigger automated digital downloads.",
     profitStrategy:
-      "💰 Monetization Formula: The complete fly-wheel: Scrape leads -> Broadcast white-label email -> Close on WhatsApp / Landing Page -> Collect via Paystack -> Reinvest profits. You now have an autonomous profit machine.",
-    actionHint: "You've completed the complete tutorial! You now hold the master blueprint to build and scale profitably.",
+      "💰 Monetization Formula: The complete flywheel: Scrape leads -> Broadcast white-label email -> Run 7-day follow-up -> Close on WhatsApp / Landing Page -> Collect via Paystack -> Reinvest profits.",
+    actionHint: "Inspect your revenue metrics and checkout links in the Sales Studio.",
+  },
+  {
+    id: 14,
+    title: "Universal Ecosystem Data Bus & 1-Click Master Sync",
+    subtitle: "Step 14 of 15 • Data Hub",
+    tab: "dashboard",
+    badge: "Universal Sync",
+    icon: RefreshCw,
+    description:
+      "The central nervous system of BizPilot OS. The Universal Data Bus connects all 8 subsystem engines so changes in one module instantly propagate to all others.",
+    keyFeatures: [
+      "Live 'Data Bus Synced' pulse indicator in the top navigation header",
+      "1-Click '⚡ Sync Everything Now' master orchestrator (Cmd+K shortcut)",
+      "Cross-module event listeners: LeadSync, DomainSync, InvoiceSync, and SystemSync",
+      "Reconciles CRM pipeline value, invoice numbers, domain bindings, and scouted vaults simultaneously",
+    ],
+    syncExplanation:
+      "🔄 Synced: When you set a primary domain, create an invoice, or scout new leads, the Data Bus ensures zero stale data across all views.",
+    profitStrategy:
+      "💰 Monetization Formula: Saves 15+ hours per week of manual data entry, prevents lost sales, and ensures your team always sees accurate pipeline numbers.",
+    actionHint: "Click the green 'Data Bus Synced' button in the top bar to inspect your system's live health.",
+  },
+  {
+    id: 15,
+    title: "Production Deployment: GitHub & Vercel Guide",
+    subtitle: "Step 15 of 15 • Going Live",
+    tab: "integrations",
+    badge: "Deploy Guide",
+    icon: Terminal,
+    description:
+      "Complete step-by-step code and instructions to initialize Git, push this repository to GitHub, and deploy live to Vercel in under 2 minutes.",
+    keyFeatures: [
+      "Vite SPA pre-configured with vercel.json rewrite rules",
+      "Ready for custom domain binding (e.g., yourname.com) on Vercel",
+      "Environment variable setup for live Paystack & Resend API keys",
+    ],
+    syncExplanation:
+      "🔄 Synced: Once deployed to Vercel, your live URL works seamlessly on desktop and mobile with instant HTTPS SSL certificates.",
+    profitStrategy:
+      "💰 Monetization Formula: Deploy your live app, attach your custom domain, connect Paystack keys, and start onboarding paying clients immediately.",
+    actionHint: "Copy the terminal commands below to push to GitHub and deploy to Vercel!",
+    codeSnippet: `# ========================================================
+# 1. INITIALIZE LOCAL GIT REPOSITORY
+# ========================================================
+git init
+git add .
+git commit -m "feat: complete BizPilot OS with Universal Data Bus & 7-Day Follow-Up Engine"
+
+# ========================================================
+# 2. CREATE A REPO ON GITHUB AND PUSH
+# ========================================================
+# Create a repository on https://github.com/new (e.g., "bizpilot-os")
+# Then run:
+git branch -M main
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/bizpilot-os.git
+git push -u origin main
+
+# ========================================================
+# 3. DEPLOY TO VERCEL (EASIEST METHOD: DASHBOARD)
+# ========================================================
+# 1. Go to https://vercel.com/new
+# 2. Click "Import" next to your "bizpilot-os" repository
+# 3. Framework Preset: Vite
+# 4. Build Command: vite build
+# 5. Output Directory: dist
+# 6. Click "Deploy" (Your app will be live in ~45 seconds!)
+
+# ========================================================
+# OR DEPLOY DIRECTLY VIA VERCEL CLI:
+# ========================================================
+npm i -g vercel
+vercel login
+vercel --prod`,
   },
 ];
 
@@ -294,7 +400,8 @@ export const DemoTutorialGuide: React.FC<Props> = ({
   isOpen,
   onClose,
 }) => {
-  const [currentStepIndex, setCurrentStepIndex] = React.useState(0);
+  const [currentStepIndex, setCurrentStepIndex] = useState(0);
+  const [copiedSnippet, setCopiedSnippet] = useState(false);
 
   if (!isOpen) return null;
 
@@ -324,6 +431,14 @@ export const DemoTutorialGuide: React.FC<Props> = ({
   const handleJumpToStep = (index: number) => {
     setCurrentStepIndex(index);
     onNavigate(DEMO_STEPS[index].tab);
+  };
+
+  const handleCopyCode = () => {
+    if (currentStep.codeSnippet) {
+      navigator.clipboard.writeText(currentStep.codeSnippet);
+      setCopiedSnippet(true);
+      setTimeout(() => setCopiedSnippet(false), 3000);
+    }
   };
 
   return (
@@ -359,12 +474,12 @@ export const DemoTutorialGuide: React.FC<Props> = ({
         </div>
 
         {/* Step Progress Bar */}
-        <div className="bg-slate-100 dark:bg-slate-800/80 px-6 py-2.5 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-1.5 overflow-x-auto">
+        <div className="bg-slate-100 dark:bg-slate-800/80 px-6 py-2.5 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-1.5 overflow-x-auto scrollbar-none">
           {DEMO_STEPS.map((s, idx) => (
             <button
               key={s.id}
               onClick={() => handleJumpToStep(idx)}
-              className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold transition whitespace-nowrap ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold transition whitespace-nowrap shrink-0 ${
                 idx === currentStepIndex
                   ? "bg-slate-900 dark:bg-indigo-600 text-white shadow-xs"
                   : idx < currentStepIndex
@@ -398,6 +513,28 @@ export const DemoTutorialGuide: React.FC<Props> = ({
               ))}
             </div>
           </div>
+
+          {/* Code Snippet (When Available) */}
+          {currentStep.codeSnippet && (
+            <div className="rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 overflow-hidden shadow-md">
+              <div className="flex items-center justify-between px-4 py-2.5 bg-slate-900 border-b border-slate-800 text-xs font-mono">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Terminal className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Terminal Deploy Commands</span>
+                </div>
+                <button
+                  onClick={handleCopyCode}
+                  className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 transition"
+                >
+                  <Copy className="w-3 h-3" />
+                  <span>{copiedSnippet ? "✓ Copied!" : "Copy Commands"}</span>
+                </button>
+              </div>
+              <pre className="p-4 text-xs font-mono text-emerald-400 overflow-x-auto leading-relaxed whitespace-pre">
+                {currentStep.codeSnippet}
+              </pre>
+            </div>
+          )}
 
           {/* How to Make Money & Profit With this Feature */}
           {currentStep.profitStrategy && (

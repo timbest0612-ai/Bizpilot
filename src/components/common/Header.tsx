@@ -25,6 +25,7 @@ interface Props {
   onStartDemoTutorial?: () => void;
   onOpenSupportChat?: () => void;
   onOpenOmniCommand?: () => void;
+  onOpenSyncCenter?: () => void;
 }
 
 export const Header: React.FC<Props> = ({
@@ -38,6 +39,7 @@ export const Header: React.FC<Props> = ({
   onStartDemoTutorial,
   onOpenSupportChat,
   onOpenOmniCommand,
+  onOpenSyncCenter,
 }) => {
   const curr = CURRENCIES[activeCurrency] || CURRENCIES.NGN;
 
@@ -74,6 +76,22 @@ export const Header: React.FC<Props> = ({
       </div>
 
       <div className="flex items-center gap-2.5 md:gap-4">
+        {/* Universal Ecosystem Sync Center */}
+        {onOpenSyncCenter && (
+          <button
+            onClick={onOpenSyncCenter}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-bold border border-emerald-200 dark:border-emerald-800/80 transition-all shadow-2xs"
+            title="Open Universal Ecosystem Sync Center (All 8 Engines Connected)"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <Zap className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
+            <span className="hidden sm:inline">Data Bus Synced</span>
+          </button>
+        )}
+
         {/* Quick Command & Omni-Search */}
         {onOpenOmniCommand && (
           <button
